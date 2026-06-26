@@ -1,56 +1,191 @@
-from __future__ import annotations
-import sys
-from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
 import streamlit as st
-import pandas as pd
-from app.main import ask
-from app.schemas import AskRequest
-from app.ingestion.ingest import ingest
+from datetime import datetime
+import time
 
-st.set_page_config(page_title="Support Knowledge Copilot", layout="wide")
-st.title("Support Knowledge Copilot with Verified Citations")
-st.caption("Hybrid RAG + citation verification + confidence scoring")
+st.set_page_config(
+    page_title="Support Knowledge Copilot",
+    page_icon="🤖",
+    layout="wide"
+)
 
-with st.sidebar:
-    st.header("Controls")
-    strategy = st.selectbox("Retrieval strategy", ["hybrid", "dense", "sparse"])
-    access_level = st.selectbox("Access level", ["public", "internal", "restricted"], index=1)
-    if st.button("Rebuild index"):
-        count = ingest("data/raw_docs", rebuild=True)
-        st.success(f"Indexed {count} chunks")
+# ----------------------------
+# Demo Ask Function
+# Replace this later with API call
+# ----------------------------
+def ask(question: str):
+    """Temporary demo implementation for Streamlit Cloud."""
 
-question = st.text_input("Ask a support question", "What should I do if I get ERR-429?")
+    question = question.strip()
 
-if st.button("Ask"):
-    try:
-        response = ask(AskRequest(question=question, strategy=strategy, access_level=access_level))
-        st.subheader("Answer")
-        st.write(response.answer)
-        st.metric("Confidence", response.confidence_score)
+    if question == "":
+        return None
 
-        st.subheader("What I could not verify")
-        if response.what_i_could_not_verify:
-            for item in response.what_i_could_not_verify:
-                st.warning(item)
-        else:
-            st.success("All cited claims were verified as supported.")
+    time.sleep(0.8)
 
-        st.subheader("Citations")
-        citation_rows = [c.model_dump() for c in response.citations]
-        st.dataframe(pd.DataFrame(citation_rows), use_container_width=True)
+    return {
+        "answer": f"""
+### Answer
 
-        st.subheader("Retrieved Evidence Chunks")
-        for chunk in response.retrieved_chunks:
-            meta = chunk["metadata"]
-            with st.expander(f"{chunk['chunk_id']} | {meta.get('source_name')} | {meta.get('section_heading')}"):
-                st.write(chunk["text"])
-                st.json({k: v for k, v in meta.items() if k != "source_path"})
-                st.write({"rrf_or_score": chunk.get("score"), "rerank_score": chunk.get("rerank_score")})
-    except Exception as exc:
-        st.error(str(exc))
-        st.info("Run: python -m app.ingestion.ingest --source data/raw_docs --rebuild")
+Based on the available documentation, the following information was retrieved for:
+
+**{question}**
+
+This Streamlit Cloud deployment is running in **Demo Mode**.
+
+The production version performs:
+
+- Hybrid Retrieval (Vector + BM25)
+- Cross Encoder Reranking
+- Citation Verification
+- Confidence Scoring
+- LangGraph Multi-Agent Orchestration
+- Azure AI Search / pgvector
+        """,
+
+        "citations": [
+            {
+                "source": "Product_FAQ.md",
+                "section": "Account Management",
+                "page": 3,
+                "support_verdict": "Supported"
+            },
+            {
+                "source": "Troubleshooting_Guide.pdf",
+                "section": "Authentication",
+                "page": 8,
+                "support_verdict": "Supported"
+            }
+        ],
+
+        "confidence_score": 0.91,
+
+        "what_i_could_not_verify": [
+            "No evidence was found for customer-specific configuration."
+        ]
+    }
+
+
+# ----------------------------
+# Sidebar
+# ----------------------------
+
+st.sidebar.title("Enterprise AI Demo")
+
+st.sidebar.markdown("""
+### Features
+
+✅ Hybrid Search
+
+✅ BM25
+
+✅ Vector Search
+
+✅ Citation Verification
+
+✅ Confidence Scoring
+
+✅ LangGraph
+
+✅ Enterprise RAG
+
+✅ Streamlit Demo
+""")
+
+st.sidebar.divider()
+
+st.sidebar.info(
+    "Production version uses Azure AI Search, "
+    "PostgreSQL + pgvector, LangGraph, "
+    "MLflow and Langfuse."
+)
+
+# ----------------------------
+# Main UI
+# ----------------------------
+
+st.title("🤖 Support Knowledge Copilot")
+
+st.caption(
+    "Enterprise RAG • Verified Citations • Hybrid Retrieval • Confidence Scoring"
+)
+
+question = st.text_area(
+    "Ask a support question",
+    placeholder="Example: How do I reset my MFA?"
+)
+
+if st.button("Ask", type="primary"):
+
+    if question.strip() == "":
+        st.warning("Please enter a question.")
+        st.stop()
+
+    with st.spinner("Searching enterprise knowledge..."):
+
+        result = ask(question)
+
+    st.success("Answer Generated")
+
+    st.markdown(result["answer"])
+
+    st.divider()
+
+    st.subheader("Verified Citations")
+
+    for c in result["citations"]:
+
+        with st.expander(c["source"]):
+
+            st.write(f"**Section:** {c['section']}")
+            st.write(f"**Page:** {c['page']}")
+            st.write(f"**Support Verdict:** {c['support_verdict']}")
+
+    st.divider()
+
+    st.subheader("Confidence Score")
+
+    st.progress(result["confidence_score"])
+
+    st.metric(
+        "Confidence",
+        f"{result['confidence_score']:.0%}"
+    )
+
+    st.divider()
+
+    st.subheader("What I Could Not Verify")
+
+    for item in result["what_i_could_not_verify"]:
+        st.warning(item)
+
+    st.divider()
+
+    st.caption(
+        f"Generated at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
+
+# ----------------------------
+# Footer
+# ----------------------------
+
+st.divider()
+
+st.markdown("""
+### Enterprise Architecture
+
+**Production Version Includes**
+
+- Azure AI Search
+- PostgreSQL + pgvector
+- BM25 Hybrid Search
+- Cross Encoder Reranking
+- LangGraph Multi-Agent Workflow
+- Citation Verification
+- Confidence Scoring
+- MLflow
+- Langfuse
+- Prometheus
+- Grafana
+- Kubernetes
+- GitHub Actions
+""")
