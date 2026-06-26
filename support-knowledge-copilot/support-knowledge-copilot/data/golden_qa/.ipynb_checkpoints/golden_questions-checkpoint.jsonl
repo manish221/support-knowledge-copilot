@@ -1,0 +1,7 @@
+{"question":"What does ERR-429 mean and what should a client do?","expected_chunks":["Troubleshooting Guide"],"answer_type":"lookup"}
+{"question":"What is the default API rate limit?","expected_chunks":["API Documentation"],"answer_type":"lookup"}
+{"question":"Can enterprise tenants request a higher API rate limit?","expected_chunks":["Release Notes May 2026"],"answer_type":"multi_doc"}
+{"question":"How can a user reset MFA if they still have access to email?","expected_chunks":["Product FAQ"],"answer_type":"lookup"}
+{"question":"What happens if a user cannot access email during MFA reset?","expected_chunks":["Product FAQ","Release Notes May 2026"],"answer_type":"multi_doc"}
+{"question":"What is the SLA for a P1 incident?","expected_chunks":["Support Policy"],"answer_type":"lookup"}
+{"question":"Does the product support FedRAMP High?","expected_chunks":[],"answer_type":"no_answer"}

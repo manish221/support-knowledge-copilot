@@ -1,0 +1,17 @@
+source_name: Support Policy
+section_heading: Support Escalation and SLA
+document_type: policy
+last_updated: 2026-02-12
+access_level: public
+product: SupportPortal
+version: v2.0
+
+Support priority levels
+P1 incidents are production outages affecting all users or critical business workflows. P1 cases receive a target first response within 30 minutes.
+
+P2 incidents are major functional issues affecting a subset of users. P2 cases receive a target first response within 4 business hours.
+
+P3 incidents are general support requests or minor issues. P3 cases receive a target first response within 1 business day.
+
+Escalation
+Customers can request escalation when a P1 or P2 issue remains unresolved beyond the target response window. Escalation requests must include business impact and affected tenant ID.
