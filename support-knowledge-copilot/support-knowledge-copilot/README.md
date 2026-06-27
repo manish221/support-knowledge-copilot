@@ -70,7 +70,3 @@ support-knowledge-copilot/
 ├── docker-compose.yml
 └── README.md
 ```
-
-## Interview talking point
-
-Dense and sparse indexes are built over the same chunk IDs so retrieval fusion, metadata filtering, citation rendering, access control, and evaluation all operate on one canonical evidence object. Dense retrieval handles semantic intent; BM25 handles exact phrases, API names, SKUs, and error codes.
